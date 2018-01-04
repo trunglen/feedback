@@ -27,6 +27,9 @@ func Recovery() gin.HandlerFunc {
 
 func AddHeader() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Origin", c.GetHeader("Origin"))
+		c.Header("Access-Control-Allow-Methods", "OPTIONS, HEAD, GET, POST, DELETE")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Range, Content-Disposition")
+		c.Header("Access-Control-Allow-Credentials", "true")
 	}
 }
