@@ -46,7 +46,6 @@ func (s *SurveyServer) AddSurveyDevice(ctx *gin.Context) {
 
 func (s *SurveyServer) GetAll(ctx *gin.Context) {
 	surveys, _ := survey.ListSurvey()
-	web.AssertNil(rest.BadRequest("dasdasdsad"))
 	s.SendData(ctx, surveys)
 }
 
