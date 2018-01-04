@@ -24,3 +24,9 @@ func Recovery() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func AddHeader() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+	}
+}

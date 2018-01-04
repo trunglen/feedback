@@ -12,7 +12,7 @@ import (
 
 func main() {
 	router := gin.New()
-	router.Use(gin.Logger(), middleware.Recovery())
+	router.Use(gin.Logger(), middleware.Recovery(), middleware.AddHeader())
 	//static
 	router.StaticFS("/static", http.Dir("./static"))
 	//api
