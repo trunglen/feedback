@@ -2,7 +2,6 @@ package survey
 
 import (
 	"feedback/x/rest"
-	"fmt"
 	"g/x/web"
 
 	"feedback/o/survey"
@@ -29,7 +28,6 @@ func NewSurveyServer(parent *gin.RouterGroup, name string) *SurveyServer {
 func (s *SurveyServer) AddSurvey(ctx *gin.Context) {
 	var srv *survey.Survey
 	web.AssertNil(ctx.ShouldBindJSON(&srv))
-	fmt.Println(srv)
 	web.AssertNil(srv.Create())
 	s.SendData(ctx, srv)
 }

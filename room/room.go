@@ -2,6 +2,7 @@ package room
 
 import (
 	"feedback/x/rest"
+	"feedback/x/socket"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,36 +13,38 @@ import (
 type RoomServer struct {
 	*gin.RouterGroup
 	rest.JsonRender
+	box *socket.Box
 }
 
 func NewRoomServer(parent *gin.RouterGroup) *RoomServer {
 	var s = RoomServer{
 		RouterGroup: parent,
+		box:         socket.NewBox(),
 	}
+	s.box.Handle("/chat", s.handleChat)
 	s.GET("/join", s.handleJoin)
 	return &s
 }
 func (s *RoomServer) handleJoin(ctx *gin.Context) {
-	serveWS(ctx.Writer, ctx.Request)
+	s.serveWS(ctx.Writer, ctx.Request)
 }
-
-func serveWS(w http.ResponseWriter, r *http.Request) {
+func (s *RoomServer) handleChat(r *socket.Request) {
+	var msg = struct {
+		To   string
+		Text string
+	}{}
+	r.MustDecodeBody(&msg)
+	glog.Info(msg)
+	s.box.SendToOther(msg.To, []byte(msg.Text))
+}
+func (s *RoomServer) serveWS(w http.ResponseWriter, r *http.Request) {
+	var id = r.URL.Query().Get("id")
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		glog.Infof("error upgrading %s", err)
 		return
 	}
-	for {
-		messageType, p, err := conn.ReadMessage()
-		if err != nil {
-			glog.Error(err)
-			return
-		}
-		if err := conn.WriteMessage(messageType, p); err != nil {
-			glog.Error(err)
-			return
-		}
-	}
+	s.box.Accept(id, conn)
 }
 
 var upgrader = &websocket.Upgrader{
