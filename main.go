@@ -1,8 +1,10 @@
 package main
 
 import (
-	"feedback/api"
+	//1
 	_ "feedback/init"
+	//2
+	"feedback/api"
 	"feedback/middleware"
 	"feedback/room"
 	"net/http"

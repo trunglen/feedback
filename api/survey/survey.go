@@ -3,6 +3,7 @@ package survey
 import (
 	"feedback/x/rest"
 	"g/x/web"
+	"io/ioutil"
 
 	"feedback/o/survey"
 
@@ -20,9 +21,20 @@ func NewSurveyServer(parent *gin.RouterGroup, name string) *SurveyServer {
 	}
 	s.GET("/list", s.GetAll)
 	s.POST("/icon/upload", s.UploadIcon)
+	s.GET("/icon/list", s.ListIcon)
 	s.POST("/device/add", s.AddSurveyDevice)
 	s.POST("/add", s.AddSurvey)
 	return &s
+}
+func (s *SurveyServer) ListIcon(ctx *gin.Context) {
+	var listIcon = []string{}
+	files, err := ioutil.ReadDir("./static/smiley")
+	web.AssertNil(err)
+	for _, item := range files {
+		listIcon = append(listIcon, "http://mqserver:8080/static/smiley/"+item.Name())
+
+	}
+	s.SendData(ctx, listIcon)
 }
 
 func (s *SurveyServer) AddSurvey(ctx *gin.Context) {

@@ -23,7 +23,14 @@ func NewCollectionSession(name string) *Collection {
 	c.Connect()
 	return &c
 }
-
+func NewCollection(name string) *mgo.Collection {
+	var c = Collection{
+		db:   newDBSession(DBNAME),
+		name: name,
+	}
+	c.Connect()
+	return c.Session
+}
 func (c *Collection) Close() {
 	service.Close(c)
 }

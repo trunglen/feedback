@@ -36,28 +36,25 @@ const (
 	ANSWER   = SurveyType("answer")
 )
 
-func newSurveyCollection() *mongodb.Collection {
-	return mongodb.NewCollectionSession("survey")
-}
+var ServiceTable = mongodb.NewTable("survey", "srv", 12)
 
 func DeleteSurveyByID(id string) error {
-	return newSurveyCollection().Session.RemoveId(id)
+	return ServiceTable.RemoveId(id)
 }
 
 func ListSurvey() ([]*Survey, error) {
 	var surveys []*Survey
-	err := newSurveyCollection().Session.Find(bson.M{}).All(&surveys)
+	err := ServiceTable.Find(bson.M{}).All(&surveys)
 	return surveys, err
 }
 
 func (s *Survey) Create() error {
 	s.ID = math.RandString("srv", 4)
-	s.BeforeCreate()
-	return newSurveyCollection().Session.Insert(s)
+	return ServiceTable.Insert(s)
 }
 
 func AddDeviceToSurvey(deviceID string, surveyID string) error {
-	return newSurveyCollection().Session.UpdateId(surveyID, bson.M{
+	return ServiceTable.UpdateId(surveyID, bson.M{
 		"$addToSet": bson.M{
 			"device_ids": []string{deviceID},
 		},
