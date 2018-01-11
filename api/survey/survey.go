@@ -47,7 +47,7 @@ func (s *SurveyServer) ListIcon(ctx *gin.Context) {
 	files, err := ioutil.ReadDir("./static/smiley")
 	web.AssertNil(err)
 	for _, item := range files {
-		listIcon = append(listIcon, "http://localhost:8080/static/smiley/"+item.Name())
+		listIcon = append(listIcon, "http://mqserver:8080/static/smiley/"+item.Name())
 
 	}
 	s.SendData(ctx, listIcon)

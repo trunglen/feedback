@@ -2,6 +2,7 @@ package survey
 
 import (
 	"feedback/x/db/mongodb"
+	"feedback/x/rest"
 
 	"github.com/golang/glog"
 
@@ -56,6 +57,11 @@ func (s *Survey) Create() error {
 }
 
 func AddDeviceToSurvey(deviceID string, surveyID string) error {
+	if _, err := GetSurveyByDevice(deviceID); err != nil {
+		if err.Error() == "not found" {
+			return rest.BadRequest(err.Error())
+		}
+	}
 	return ServiceTable.UpdateId(surveyID, bson.M{
 		"$addToSet": bson.M{
 			"device_ids": []string{deviceID},
@@ -63,7 +69,7 @@ func AddDeviceToSurvey(deviceID string, surveyID string) error {
 	})
 }
 
-func GetSurveyByFeedback(feedbackID string) (*Survey, error) {
+func GetSurveyByDevice(feedbackID string) (*Survey, error) {
 	var survey *Survey
 	var err = ServiceTable.FindOne(bson.M{"device_ids": feedbackID}, &survey)
 	if err != nil {
