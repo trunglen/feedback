@@ -64,7 +64,7 @@ func AddDeviceToSurvey(deviceID string, surveyID string) error {
 	}
 	return ServiceTable.UpdateId(surveyID, bson.M{
 		"$addToSet": bson.M{
-			"device_ids": []string{deviceID},
+			"device_ids": deviceID,
 		},
 	})
 }

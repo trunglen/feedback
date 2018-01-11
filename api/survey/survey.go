@@ -37,7 +37,7 @@ func (s *SurveyServer) handleListDeviceService(ctx *gin.Context) {
 
 func (s *SurveyServer) handleFeedbackDevice(ctx *gin.Context) {
 	var id = ctx.Param("id")
-	var srv, err = survey.GetSurveyByFeedback(id)
+	var srv, err = survey.GetSurveyByDevice(id)
 	web.AssertNil(err)
 	s.SendData(ctx, srv)
 }
