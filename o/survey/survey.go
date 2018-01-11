@@ -3,6 +3,8 @@ package survey
 import (
 	"feedback/x/db/mongodb"
 
+	"github.com/golang/glog"
+
 	"github.com/trunglen/g/x/math"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -59,6 +61,41 @@ func AddDeviceToSurvey(deviceID string, surveyID string) error {
 			"device_ids": []string{deviceID},
 		},
 	})
+}
+
+func GetSurveyByFeedback(feedbackID string) (*Survey, error) {
+	var survey *Survey
+	var err = ServiceTable.FindOne(bson.M{"device_ids": feedbackID}, &survey)
+	if err != nil {
+		glog.Error(err)
+		return nil, err
+	}
+	return survey, nil
+}
+
+type DeviceSurvey struct {
+	Name         string `json:"survey_name" bson:"survey_name"`
+	FeedbackCode string `json:"feedback_code" bson:"feedback_code"`
+}
+
+func GetListDeviceSurvey() ([]*DeviceSurvey, error) {
+	var ds []*DeviceSurvey
+	var err = ServiceTable.Pipe([]bson.M{
+		bson.M{
+			"$unwind": "$device_ids",
+		},
+		bson.M{
+			"$project": bson.M{
+				"name":          "$name",
+				"feedback_code": "$device_ids",
+			},
+		},
+	}).All(&ds)
+	if err != nil {
+		glog.Error(err)
+		return nil, err
+	}
+	return ds, nil
 }
 
 type QuestionValidator struct {
