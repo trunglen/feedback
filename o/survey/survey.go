@@ -91,7 +91,7 @@ func GetListDeviceSurvey() ([]*DeviceSurvey, error) {
 		},
 		bson.M{
 			"$project": bson.M{
-				"name":          "$name",
+				"survey_name":   "$name",
 				"feedback_code": "$device_ids",
 			},
 		},
