@@ -930,8 +930,8 @@ var UIModule = (function () {
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 var environment = {
     production: false,
-    baseURL: 'http://localhost:8080/api/',
-    baseWS: 'ws://localhost:3000/room/actor/join'
+    baseURL: 'http://mqserver:8080/api/',
+    baseWS: 'ws://mqserver:3000/room/actor/join'
 };
 
 
