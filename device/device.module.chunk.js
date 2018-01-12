@@ -921,7 +921,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/device/device/thanks/thanks.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"bounceInLeft animated\">\n  <img src=\"/assets/images/bye.png\" style=\"width:20%;height:auto;\" alt=\"\">\n  <h1 class=\"tks\">Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi</h1>\n  <h1 class=\"tks\">Chúc quý khách một ngày tốt lành</h1>\n</div>"
+module.exports = "<div class=\"bounceInLeft animated\">\n  <img src=\"./assets/images/bye.png\" style=\"width:20%;height:auto;\" alt=\"\">\n  <h1 class=\"tks\">Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi</h1>\n  <h1 class=\"tks\">Chúc quý khách một ngày tốt lành</h1>\n</div>"
 
 /***/ }),
 
