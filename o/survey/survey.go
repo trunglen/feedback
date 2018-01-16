@@ -6,7 +6,6 @@ import (
 
 	"github.com/golang/glog"
 
-	"github.com/trunglen/g/x/math"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -39,21 +38,16 @@ const (
 	ANSWER   = SurveyType("answer")
 )
 
-var ServiceTable = mongodb.NewTable("survey", "srv", 12)
-
-func DeleteSurveyByID(id string) error {
-	return ServiceTable.RemoveId(id)
-}
+var SurveyTable = mongodb.NewTable("survey", "SUR", 12)
 
 func ListSurvey() ([]*Survey, error) {
 	var surveys []*Survey
-	err := ServiceTable.Find(bson.M{}).All(&surveys)
+	err := SurveyTable.FindWhere(bson.M{}, &surveys)
 	return surveys, err
 }
 
 func (s *Survey) Create() error {
-	s.ID = math.RandString("srv", 4)
-	return ServiceTable.Insert(s)
+	return SurveyTable.Create(s)
 }
 
 func AddDeviceToSurvey(deviceID string, surveyID string) error {
@@ -62,7 +56,7 @@ func AddDeviceToSurvey(deviceID string, surveyID string) error {
 			return rest.BadRequest("Device exists in another survey")
 		}
 	}
-	return ServiceTable.UpdateId(surveyID, bson.M{
+	return SurveyTable.UpdateId(surveyID, bson.M{
 		"$addToSet": bson.M{
 			"device_ids": deviceID,
 		},
@@ -71,7 +65,7 @@ func AddDeviceToSurvey(deviceID string, surveyID string) error {
 
 func GetSurveyByDevice(feedbackID string) (*Survey, error) {
 	var survey *Survey
-	var err = ServiceTable.FindOne(bson.M{"device_ids": feedbackID}, &survey)
+	var err = SurveyTable.FindOne(bson.M{"device_ids": feedbackID}, &survey)
 	if err != nil {
 		glog.Error(err)
 		return nil, err
@@ -86,7 +80,7 @@ type DeviceSurvey struct {
 
 func GetListDeviceSurvey() ([]*DeviceSurvey, error) {
 	var ds []*DeviceSurvey
-	var err = ServiceTable.Pipe([]bson.M{
+	var err = SurveyTable.Pipe([]bson.M{
 		bson.M{
 			"$unwind": "$device_ids",
 		},

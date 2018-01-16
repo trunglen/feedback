@@ -32,6 +32,15 @@ func (t *Table) Create(model IModel) error {
 	return t.Insert(model)
 }
 
+func (t *Table) UpdateID(id string, model IModel) error {
+	model.BeforeUpdate()
+	return t.UpdateId(id, model)
+}
+
+func (t *Table) DeleteID(id string) error {
+	return t.UpdateId(id, bson.M{"update_at": 0})
+}
+
 func (t *Table) CreateUnique(query bson.M, model IModel) error {
 	count, err := t.CountWhere(query)
 	if err == nil {

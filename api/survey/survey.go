@@ -20,37 +20,15 @@ func NewSurveyServer(parent *gin.RouterGroup, name string) *SurveyServer {
 		RouterGroup: parent.Group(name),
 	}
 	s.GET("/list", s.GetAll)
+	s.POST("/create", s.AddSurvey)
+	s.POST("/update", s.handleUpdate)
+	s.GET("/delete", s.handleDelete)
 	s.POST("/icon/upload", s.UploadIcon)
 	s.GET("/icon/list", s.ListIcon)
 	s.POST("/device/add", s.AddSurveyDevice)
 	s.GET("/list-device", s.handleListDeviceService)
-	s.POST("/add", s.AddSurvey)
 	s.GET("/device/:id", s.handleFeedbackDevice)
 	return &s
-}
-
-func (s *SurveyServer) handleListDeviceService(ctx *gin.Context) {
-	var srv, err = survey.GetListDeviceSurvey()
-	web.AssertNil(err)
-	s.SendData(ctx, srv)
-}
-
-func (s *SurveyServer) handleFeedbackDevice(ctx *gin.Context) {
-	var id = ctx.Param("id")
-	var srv, err = survey.GetSurveyByDevice(id)
-	web.AssertNil(err)
-	s.SendData(ctx, srv)
-}
-
-func (s *SurveyServer) ListIcon(ctx *gin.Context) {
-	var listIcon = []string{}
-	files, err := ioutil.ReadDir("./static/smiley")
-	web.AssertNil(err)
-	for _, item := range files {
-		listIcon = append(listIcon, "http://mqserver:8080/static/smiley/"+item.Name())
-
-	}
-	s.SendData(ctx, listIcon)
 }
 
 func (s *SurveyServer) AddSurvey(ctx *gin.Context) {
@@ -58,6 +36,42 @@ func (s *SurveyServer) AddSurvey(ctx *gin.Context) {
 	web.AssertNil(ctx.BindJSON(&srv))
 	web.AssertNil(srv.Create())
 	s.SendData(ctx, srv)
+}
+
+func (s *SurveyServer) handleUpdate(ctx *gin.Context) {
+	var srv *survey.Survey
+	web.AssertNil(ctx.BindJSON(&srv))
+	web.AssertNil(survey.Update(srv))
+	s.Success(ctx)
+}
+func (s *SurveyServer) handleDelete(ctx *gin.Context) {
+	var id = ctx.Query("id")
+	rest.AssertNil(survey.DeleteByID(id))
+	s.Success(ctx)
+}
+
+func (s *SurveyServer) handleListDeviceService(ctx *gin.Context) {
+	var srv, err = survey.GetListDeviceSurvey()
+	rest.AssertNil(err)
+	s.SendData(ctx, srv)
+}
+
+func (s *SurveyServer) handleFeedbackDevice(ctx *gin.Context) {
+	var id = ctx.Param("id")
+	var srv, err = survey.GetSurveyByDevice(id)
+	rest.AssertNil(err)
+	s.SendData(ctx, srv)
+}
+
+func (s *SurveyServer) ListIcon(ctx *gin.Context) {
+	var listIcon = []string{}
+	files, err := ioutil.ReadDir("./static/smiley")
+	rest.AssertNil(err)
+	for _, item := range files {
+		listIcon = append(listIcon, "http://mqserver:8080/static/smiley/"+item.Name())
+
+	}
+	s.SendData(ctx, listIcon)
 }
 
 func (s *SurveyServer) AddSurveyDevice(ctx *gin.Context) {
