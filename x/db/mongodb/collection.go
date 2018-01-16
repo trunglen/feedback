@@ -31,6 +31,7 @@ func NewCollection(name string) *mgo.Collection {
 	c.Connect()
 	return c.Session
 }
+
 func (c *Collection) Close() {
 	service.Close(c)
 }

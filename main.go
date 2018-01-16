@@ -21,7 +21,6 @@ func main() {
 		c.Writer.Header().Set("Content-Type", "text/html")
 		c.Next()
 	})
-
 	router.Use(gin.Logger(), middleware.Recovery(), middleware.AddHeader())
 	//api
 	rootAPI := router.Group("/api")
