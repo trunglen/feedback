@@ -54,8 +54,11 @@ func (e NotFound) StatusCode() int {
 	return http.StatusNotFound
 }
 
-func AssertNil(err error) {
-	if err != nil {
-		panic(err)
+func AssertNil(errs ...error) {
+	for _, err := range errs {
+		if err != nil {
+			panic(err)
+		}
 	}
+
 }

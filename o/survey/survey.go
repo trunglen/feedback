@@ -11,23 +11,26 @@ import (
 
 type Survey struct {
 	mongodb.BaseModel `bson:",inline"`
-	Name              string     `bson:"name" json:"name"`
-	Questions         []Question `bson:"questions" json:"questions"`
+	Name              string     `bson:"name" json:"name" validate:"required"`
+	Questions         []Question `bson:"questions" json:"questions" validate:"required"`
 	DeviceID          []string   `bson:"device_ids" json:"device_ids"`
 }
 type Question struct {
 	ID      string     `bson:"id" json:"id"`
-	Content string     `bson:"content" json:"content"`
+	Content string     `bson:"content" json:"content" validate:"required"`
 	Summary string     `bson:"summary" json:"summary"`
-	Type    SurveyType `bson:"type" json:"type"`
-	Point   int        `bson:"point" json:"point"`
+	Type    SurveyType `bson:"type" json:"type" validate:"required"`
+	Point   int        `bson:"point" json:"point" validate:"gte=0"`
 	Manded  bool       `bson:"manded" json:"manded"`
-	Answers []Answer   `bson:"answers" json:"answers"`
+	Answers []Answer   `bson:"answers" json:"answers" validate:"required"`
+	Link    string     `bson:"link" json:"link"`
 }
+
+//Answer -
 type Answer struct {
 	Icon    string `bson:"icon" json:"icon"`
-	Content string `bson:"content" json:"content"`
-	Point   int    `bson:"point" json:"point"`
+	Content string `bson:"content" json:"content" validate:"required"`
+	Point   int    `bson:"point" json:"point" validate:"gte=0"`
 	Link    string `bson:"link" json:"link"`
 }
 type SurveyType string
@@ -38,8 +41,31 @@ const (
 	ANSWER   = SurveyType("answer")
 )
 
-var SurveyTable = mongodb.NewTable("survey", "SUR", 12)
+var SurveyTable = mongodb.NewTable("survey", "SUR", 5)
 
+func (q Question) Validate() error {
+	if q.Type != ANSWER {
+		var answerPointSum = 0
+		for _, item := range q.Answers {
+			if item.Point < 0 {
+				return rest.BadRequest("point of answer must be > 0")
+			}
+			answerPointSum += item.Point
+		}
+		if q.Point < answerPointSum {
+			return rest.BadRequest("point of question must be > sum of point's answers")
+		}
+	}
+	return nil
+}
+func Validate(s *Survey) error {
+	for _, item := range s.Questions {
+		if err := item.Validate(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 func ListSurvey() ([]*Survey, error) {
 	var surveys []*Survey
 	err := SurveyTable.FindWhere(bson.M{}, &surveys)
@@ -47,6 +73,7 @@ func ListSurvey() ([]*Survey, error) {
 }
 
 func (s *Survey) Create() error {
+	rest.AssertNil(rest.Validate(s), Validate(s))
 	return SurveyTable.Create(s)
 }
 

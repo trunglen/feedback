@@ -5,6 +5,7 @@ import (
 	"g/x/web"
 	"io/ioutil"
 
+	"feedback/o/result"
 	"feedback/o/survey"
 
 	"github.com/gin-gonic/gin"
@@ -20,6 +21,7 @@ func NewSurveyServer(parent *gin.RouterGroup, name string) *SurveyServer {
 		RouterGroup: parent.Group(name),
 	}
 	s.GET("/list", s.GetAll)
+	s.POST("/result/create", s.handleCreateResult)
 	s.POST("/create", s.AddSurvey)
 	s.POST("/update", s.handleUpdate)
 	s.GET("/delete", s.handleDelete)
@@ -36,6 +38,13 @@ func (s *SurveyServer) AddSurvey(ctx *gin.Context) {
 	web.AssertNil(ctx.BindJSON(&srv))
 	web.AssertNil(srv.Create())
 	s.SendData(ctx, srv)
+}
+
+func (s *SurveyServer) handleCreateResult(ctx *gin.Context) {
+	var res *result.SurveyResult
+	rest.AssertNil(ctx.BindJSON(&res), res.Create())
+	result.ConvertToAggregate(res)
+	s.SendData(ctx, res)
 }
 
 func (s *SurveyServer) handleUpdate(ctx *gin.Context) {

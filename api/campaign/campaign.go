@@ -4,6 +4,7 @@ import (
 	"feedback/o/campaign"
 	"feedback/x/rest"
 	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,6 +23,7 @@ func NewCampaignServer(parent *gin.RouterGroup, name string) *CampaignServer {
 	s.POST("/update", s.handleUpdate)
 	s.GET("/delete", s.handleDelete)
 	s.POST("/device/create", s.handleAddDevice)
+	s.GET("/device/get", s.handleGetCampaign)
 	return &s
 }
 func (s *CampaignServer) handleAddDevice(ctx *gin.Context) {
@@ -54,4 +56,11 @@ func (s *CampaignServer) handleDelete(ctx *gin.Context) {
 	fmt.Println(id)
 	rest.AssertNil(campaign.DeleteByID(id))
 	s.Success(ctx)
+}
+func (s *CampaignServer) handleGetCampaign(ctx *gin.Context) {
+	var deviceID = ctx.Query("device_id")
+	var at, _ = strconv.Atoi(ctx.Query("at"))
+	var c, err = campaign.GetCampaignDevice(deviceID, int64(at))
+	rest.AssertNil(err)
+	s.SendData(ctx, c)
 }

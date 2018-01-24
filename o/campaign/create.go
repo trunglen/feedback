@@ -1,23 +1,25 @@
 package campaign
 
 import (
+	"feedback/o/survey"
 	"feedback/x/db/mongodb"
+	"feedback/x/rest"
 	"fmt"
-
-	"gopkg.in/mgo.v2/bson"
 )
 
 var CampaignTable = mongodb.NewTable("campaign", "CAM", 5)
 
 func (c *Campaign) Create() error {
+	rest.AssertNil(rest.Validate(c), survey.CheckExistSurveys(c.Surveys))
+	var campaigns, err = GetCampaignByDevices(c.Devices, c.Start)
+	rest.AssertNil(err)
+	for _, item := range campaigns {
+		errStr := fmt.Sprintf("Thiết bị %s không thể áp dụng vì đang được áp dụng trong chiến dịch %s", item.Device, item.Name)
+		return rest.BadRequest(errStr)
+	}
 	return CampaignTable.Create(c)
 }
 func UpdateByID(newCampaign *Campaign) error {
-	fmt.Println(newCampaign)
+	rest.AssertNil(rest.Validate(newCampaign))
 	return CampaignTable.UpdateID(newCampaign.ID, newCampaign)
-}
-func GetCampaigns() ([]*Campaign, error) {
-	var campaigns []*Campaign
-	err := CampaignTable.FindWhere(bson.M{}, &campaigns)
-	return campaigns, err
 }
