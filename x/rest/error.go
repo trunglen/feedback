@@ -62,3 +62,9 @@ func AssertNil(errs ...error) {
 	}
 
 }
+func IsNotFound(err error) bool {
+	if err.Error() == "not found" {
+		return true
+	}
+	return false
+}
