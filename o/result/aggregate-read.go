@@ -2,6 +2,7 @@ package result
 
 import (
 	"feedback/x/utils"
+	"strings"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -110,8 +111,8 @@ type CampaignReport struct {
 	SurveyName   string  `bson:"survey_name" json:"survey_name"`
 	Count        string  `bson:"count" json:"count"`
 	AveragePoint float32 `bson:"average_point" json:"average_point"`
-	Start        int     `bson:"start"  json:"-" `
-	End          int     `bson:"end" json:"-"`
+	Start        int64   `bson:"start"  json:"-" `
+	End          int64   `bson:"end" json:"-"`
 	Duration     string  `bson:"-" json:"duration"`
 }
 
@@ -160,12 +161,86 @@ func GetCampaignReport(start, end int) ([]*CampaignReport, error) {
 	}
 	return result, err
 }
+
+type History struct {
+	CreatedAt string
+}
+
+func GetHistory(start, end int) ([]*SurveyResult, error) {
+	var histories []*SurveyResult
+	var match = matchAggregateDuration(start, end)
+	var unwind = bson.M{
+		"$unwind": "$survey_detail",
+	}
+
+	var project = bson.M{
+		"$project": bson.M{
+			"created_at":    "$created_at",
+			"uname":         "$uname",
+			"store":         "$store",
+			"device":        "$device",
+			"point":         bson.M{"$sum": "$survey_detail.feedback_detail.point"},
+			"max_point":     bson.M{"$sum": "$survey_detail.feedback_detail.max_point"},
+			"survey_detail": "$survey_detail",
+		},
+	}
+
+	var group = bson.M{
+		"$group": bson.M{
+			"_id": bson.M{
+				"created_at": "$created_at",
+				"uname":      "$uname",
+				"store":      "$store",
+				"device":     "$device",
+			},
+			"survey_detail": bson.M{"$addToSet": "$survey_detail"},
+			"point":         bson.M{"$sum": "$point"},
+			"max_point":     bson.M{"$sum": "$max_point"},
+		},
+	}
+
+	var project2 = bson.M{
+		"$project": bson.M{
+			"_id":           0,
+			"created_at":    "$_id.created_at",
+			"uname":         "$_id.uname",
+			"store":         "$_id.store",
+			"device":        "$_id.device",
+			"point":         bson.M{"$sum": "$point"},
+			"max_point":     bson.M{"$sum": "$max_point"},
+			"avg":           bson.M{"$divide": []string{"$point", "$max_point"}},
+			"survey_detail": "$survey_detail",
+		},
+	}
+	err := ResultTable.Pipe([]bson.M{match, unwind, project, group, project2}).All(&histories)
+	if histories != nil {
+		for _, item := range histories {
+			item.TransformData()
+		}
+	}
+	return histories, err
+}
+
 func (r *GeneralReport) TransformData() {
 	r.HighPercent = utils.Float32ToPercentString(float32(r.High) / float32(r.Count))
 	r.CreditPercent = utils.Float32ToPercentString(float32(r.Credit) / float32(r.Count))
 	r.MediumPercent = utils.Float32ToPercentString(float32(r.Medium) / float32(r.Count))
 	r.LowPercent = utils.Float32ToPercentString(float32(r.Low) / float32(r.Count))
+	r.AveragePoint = utils.FormatFloatPoint(r.AveragePoint)
 }
+
 func (r *CampaignReport) TransformData() {
-	r.Duration = utils.UnixToDate(r.Start)
+	var split = func(input int64) string {
+		return strings.Split(utils.UnixToDate(input), " ")[0]
+	}
+	var start = split(r.Start)
+	var end = split(r.End)
+	r.Duration = start + " - " + end
+}
+
+func (r *SurveyResult) TransformData() {
+	r.Avg = utils.FormatFloatPoint(float32(r.Point) / float32(r.MaxPoint))
+	var temp = strings.Split(utils.UnixToDate(r.CreatedAt), " ")
+	r.DayCtime = temp[0]
+	r.HourCtime = temp[1]
 }

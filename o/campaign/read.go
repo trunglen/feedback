@@ -58,6 +58,7 @@ func GetCampaignByDevices(deviceArr []string, start int64) ([]*Campaign, error) 
 					bson.M{"devices": bson.M{"$in": deviceArr}},
 					bson.M{"end": bson.M{"$gte": start}},
 					bson.M{"start": bson.M{"$lte": start}},
+					bson.M{"updated_at": bson.M{"$ne": 0}},
 				},
 			},
 		},

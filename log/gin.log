@@ -1,2 +1,11 @@
-[GIN] 2018/01/24 - 09:35:27 | 400 |      4.0062ms |             ::1 | POST     /api/campaign/create
-[GIN] 2018/01/24 - 09:37:04 | 200 |      2.9991ms |             ::1 | POST     /api/campaign/create
+[GIN] 2018/01/25 - 07:03:11 | 200 |      1.0018ms |             ::1 | GET      /api/report/general?start=1&end=99999999999999&by=uname
+[GIN] 2018/01/25 - 07:05:00 | 200 |      1.0018ms |             ::1 | GET      /api/report/general?start=1&end=99999999999999&by=store
+[GIN] 2018/01/25 - 07:05:11 | 200 |      1.0025ms |             ::1 | GET      /api/report/general?start=1&end=99999999999999&by=stores
+[GIN] 2018/01/25 - 07:07:56 | 200 |      3.0048ms |             ::1 | GET      /api/campaign/device/get?device_id=AMAST02_F1&at=1516838876
+[GIN] 2018/01/25 - 07:08:55 | 200 |      1.0008ms |             ::1 | GET      /api/campaign/device/get?device_id=AMAST02_F1&at=1516838935
+[GIN] 2018/01/25 - 07:09:14 | 200 |            0s |             ::1 | OPTIONS  /api/survey/result/create
+[GIN] 2018/01/25 - 07:09:14 | 200 |     11.0034ms |             ::1 | POST     /api/survey/result/create
+[GIN] 2018/01/25 - 07:09:22 | 200 |      1.0021ms |             ::1 | GET      /api/report/general?start=1&end=99999999999999&by=stores
+[GIN] 2018/01/25 - 07:09:49 | 200 |      1.5027ms |             ::1 | GET      /api/report/general?start=1&end=99999999999999&by=uname
+[GIN] 2018/01/25 - 07:09:56 | 200 |      2.5024ms |             ::1 | GET      /api/report/general?start=1&end=99999999999999&by=device
+[GIN] 2018/01/25 - 07:10:13 | 200 |      1.0007ms |             ::1 | GET      /api/report/general?start=1&end=99999999999999&by=device_name

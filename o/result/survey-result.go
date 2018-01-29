@@ -14,7 +14,11 @@ type SurveyResult struct {
 	CampaignID        string         `bson:"campaign_id" json:"campaign_id"`
 	Question          string         `bson:"question" json:"question"`
 	SurveyDetails     []SurveyDetail `bson:"survey_detail" json:"survey_detail"`
+	Point             int            `bson:"point" json:"point"`
+	MaxPoint          int            `bson:"max_point" json:"max_point"`
 	Avg               float32        `bson:"avg" json:"avg"`
+	DayCtime          string         `bson:"day_ctime" json:"day_ctime"`
+	HourCtime         string         `bson:"hour_ctime" json:"hour_ctime"`
 }
 
 type SurveyDetail struct {
@@ -73,5 +77,6 @@ func ConvertToAggregate(s *SurveyResult) {
 		}
 		a.AveragePoint = avgPoint
 		AggregateTable.Create(&a)
+		a.High, a.Credit, a.Medium, a.Low = false, false, false, false
 	}
 }
