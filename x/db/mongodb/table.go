@@ -38,7 +38,7 @@ func (t *Table) UpdateID(id string, model IModel) error {
 }
 
 func (t *Table) DeleteID(id string) error {
-	return t.UpdateId(id, bson.M{"$set": bson.M{"update_at": 0}})
+	return t.UpdateId(id, bson.M{"$set": bson.M{"updated_at": 0}})
 }
 
 func (t *Table) CreateUnique(query bson.M, model IModel) error {
