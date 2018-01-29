@@ -53,20 +53,20 @@ func (t *Table) CreateUnique(query bson.M, model IModel) error {
 }
 
 func (t *Table) CountWhere(query bson.M) (int, error) {
-	query["update_at"] = bson.M{
+	query["updated_at"] = bson.M{
 		"$ne": 0,
 	}
 	return t.Find(query).Count()
 }
 
 func (t *Table) FindWhere(query bson.M, result interface{}) error {
-	query["update_at"] = bson.M{
+	query["updated_at"] = bson.M{
 		"$ne": 0,
 	}
 	return t.Find(query).All(result)
 }
 func (t *Table) FindOne(query bson.M, result interface{}) error {
-	query["update_at"] = bson.M{
+	query["updated_at"] = bson.M{
 		"$ne": 0,
 	}
 	return t.Find(query).One(result)
